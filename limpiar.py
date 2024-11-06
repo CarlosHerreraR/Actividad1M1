@@ -9,6 +9,7 @@ from mesa.visualization.modules import ChartModule
 from robot import *
 import mesa
 import random
+from mesa.visualization.modules import TextElement
 
 # Visualize agents and it respective color code
 def agent_portrayal(agent):
@@ -45,10 +46,16 @@ y = diceSize()
 grid = mesa.visualization.CanvasGrid(agent_portrayal, x, y, 500, 500)
 chart = ChartModule([{ "Label": "Steps", "Color": "Black" }], data_collector_name = 'datacollector')
 
+class CleanPercentageElement(TextElement):
+    def render(self, model):
+        return f"Cleaned: {model.get_clean_percentage():.2f}%"
+
+clean_percentage_element = CleanPercentageElement()
+
 # Start mesa server
 server = mesa.visualization.ModularServer(
     CleaningRobots,
-    [grid, chart],
+    [grid, chart, clean_percentage_element],
     "Cleaning robots",
     {"R": diceSize(),
      "C": diceSize(),
@@ -58,5 +65,3 @@ server = mesa.visualization.ModularServer(
 )
 server.port = 8080
 server.launch()
-
-#una matriz que recuerde donde ha estado
