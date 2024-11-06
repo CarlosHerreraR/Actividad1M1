@@ -47,8 +47,21 @@ grid = mesa.visualization.CanvasGrid(agent_portrayal, x, y, 500, 500)
 chart = ChartModule([{ "Label": "Steps", "Color": "Black" }], data_collector_name = 'datacollector')
 
 class CleanPercentageElement(TextElement):
+    #def render(self, model):
+        #return f"Cleaned: {model.get_clean_percentage():.2f}%"
     def render(self, model):
-        return f"Cleaned: {model.get_clean_percentage():.2f}%"
+        return f"""
+        <div style="
+            position: absolute;
+            right: 25px;
+            top: 80px;
+            font-size: 20px;
+            font-weight: bold;
+            color: black;
+        ">
+            Cleaned: {model.get_clean_percentage():.2f}%
+        </div>
+        """
 
 clean_percentage_element = CleanPercentageElement()
 
