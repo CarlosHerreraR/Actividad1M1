@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mesa
 import random
+import time  # Importar time para medir el tiempo
 
 # Robot agent.
 class RobotAgent(mesa.Agent):
@@ -72,11 +73,15 @@ class CleaningRobots(mesa.Model):
         self.num_agentsC = C
         self.grid = mesa.space.MultiGrid(width, height, True)
         self.schedule = mesa.time.RandomActivation(self)
-        self.max_steps = max_steps  # Maximum steps for simulation
-        self.current_step = 0  # Initialize current step counter
-        self.running = True  # Ensure simulation runs initially
-        
-        # Create robots
+        self.max_steps = max_steps
+        self.current_step = 0
+        self.running = True
+
+        # Tiempo inicial
+        self.start_time = time.time()
+        self.elapsed_time = None  # Inicializa elapsed_time como None
+
+        # Crear robots y celdas
         for i in range(self.num_agentsR):
             a = RobotAgent(i, self)
             self.schedule.add(a)
@@ -84,7 +89,6 @@ class CleaningRobots(mesa.Model):
         
         self.num_agentsC += self.num_agentsR
         
-        # Create cells
         for o in range(self.num_agentsR, self.num_agentsC):
             b = DirtyCell(o, self)
             self.schedule.add(b)
@@ -92,36 +96,34 @@ class CleaningRobots(mesa.Model):
             y = self.random.randrange(self.grid.height)
             self.grid.place_agent(b, (x, y))
 
-        print("Initial dirty cells:", self.num_agentsC - self.num_agentsR)
+        self.datacollector = mesa.DataCollector(agent_reporters={"Steps": "pos"})
 
-        self.datacollector = mesa.DataCollector(
-            agent_reporters={"Steps": "pos"}
-        )
-        
     def all_cells_clean(self):
-        # Checks if all dirty cells are clean
         return all(agent.isClean for agent in self.schedule.agents if isinstance(agent, DirtyCell))
 
     def get_clean_percentage(self):
-        # Calculate the percentage of clean cells
         clean_cells = sum(1 for agent in self.schedule.agents if isinstance(agent, DirtyCell) and agent.isClean)
         total_dirty_cells = self.num_agentsC - self.num_agentsR
         return (clean_cells / total_dirty_cells) * 100
 
     def total_moves(self):
-        # Calculate the total number of moves by all agents
         return sum(agent.moves for agent in self.schedule.agents if isinstance(agent, RobotAgent))
+
+    def get_elapsed_time(self):
+        return self.elapsed_time  # Método para obtener elapsed_time
 
     def step(self):
         self.datacollector.collect(self)
         self.schedule.step()
         self.current_step += 1
 
-        # Stop the simulation if all cells are clean or max steps are reached
         if self.all_cells_clean() or self.current_step >= self.max_steps:
-            print("Simulation ended after steps:", self.current_step)
-            print("Percentage of clean cells:", self.get_clean_percentage())
-            print("Total moves made by all agents:", self.total_moves())
+            # Calcula elapsed_time al finalizar la simulación
+            self.elapsed_time = time.time() - self.start_time
+            print(f"Simulation ended after steps: {self.current_step}")
+            print(f"Total time taken: {self.elapsed_time:.2f} seconds")
+            print(f"Percentage of clean cells: {self.get_clean_percentage():.2f}%")
+            print(f"Total moves made by all agents: {self.total_moves()}")
             self.running = False
 
 
