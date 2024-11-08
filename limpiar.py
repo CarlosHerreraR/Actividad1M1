@@ -37,7 +37,7 @@ def agent_portrayal(agent):
 
 # Serves as a dice to generate random size grid
 def diceSize():
-    return random.randint(3, 12)
+    return random.randint(12, 12)
 
 x = diceSize()
 y = diceSize()
