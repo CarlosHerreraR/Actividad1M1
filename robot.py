@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mesa
 import random
-import time  # Importar time para medir el tiempo
+import time 
 
 # Robot agent.
 class RobotAgent(mesa.Agent):
@@ -89,6 +89,7 @@ class CleaningRobots(mesa.Model):
         
         self.num_agentsC += self.num_agentsR
         
+        # Crear celdas sucias
         for o in range(self.num_agentsR, self.num_agentsC):
             b = DirtyCell(o, self)
             self.schedule.add(b)
@@ -98,20 +99,25 @@ class CleaningRobots(mesa.Model):
 
         self.datacollector = mesa.DataCollector(agent_reporters={"Steps": "pos"})
 
+    # Función para verificar si todas las celdas están limpias
     def all_cells_clean(self):
         return all(agent.isClean for agent in self.schedule.agents if isinstance(agent, DirtyCell))
 
+    #Funcion para obtener el porcentaje de celdas limpias
     def get_clean_percentage(self):
         clean_cells = sum(1 for agent in self.schedule.agents if isinstance(agent, DirtyCell) and agent.isClean)
         total_dirty_cells = self.num_agentsC - self.num_agentsR
         return (clean_cells / total_dirty_cells) * 100
 
+    # Función para obtener el total de movimientos realizados por todos los agentes
     def total_moves(self):
         return sum(agent.moves for agent in self.schedule.agents if isinstance(agent, RobotAgent))
 
+    # Función para obtener el tiempo transcurrido
     def get_elapsed_time(self):
-        return self.elapsed_time  # Método para obtener elapsed_time
+        return self.elapsed_time  
 
+    # Función para avanzar un paso en la simulación
     def step(self):
         self.datacollector.collect(self)
         self.schedule.step()
@@ -127,13 +133,14 @@ class CleaningRobots(mesa.Model):
             self.running = False
 
 
-# Pruebas con matplotlib
+
 if __name__ == '__main__':
-    model = CleaningRobots(5, 10, 10, 10, max_steps=100)  # Set max steps
+    # Máximo de pasos
+    model = CleaningRobots(5, 10, 10, 10, max_steps=100)  
     while model.running:
         model.step()
 
-    # Show the final state of the grid
+    # Visualización del mapa
     agent_counts = np.zeros((model.grid.width, model.grid.height))
     for cell in model.grid.coord_iter():
         cell_content, x, y = cell

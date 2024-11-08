@@ -11,7 +11,7 @@ import mesa
 import random
 from mesa.visualization.modules import TextElement
 
-# Visualize agents and it respective color code
+# Modelo de la simulación de los agentes.
 def agent_portrayal(agent):
     """
     Defines the visual apereancela of each agent acording to their type.
@@ -35,14 +35,14 @@ def agent_portrayal(agent):
         portrayal["Color"] = "blue"
     return portrayal
 
-# Serves as a dice to generate random size grid
+#Calcula un número aleatorio para el tamaño del tablero
 def diceSize():
     return random.randint(12, 12)
 
 x = diceSize()
 y = diceSize()
 
-# Instanciate grid and chart
+# Instanciar grid y agentes
 grid = mesa.visualization.CanvasGrid(agent_portrayal, x, y, 500, 500)
 chart = ChartModule([{ "Label": "Steps", "Color": "Black" }], data_collector_name = 'datacollector')
 
@@ -66,7 +66,7 @@ class CleanPercentageElement(TextElement):
 
 clean_percentage_element = CleanPercentageElement()
 
-# Start mesa server
+#Inicializar servidor de Mesa
 server = mesa.visualization.ModularServer(
     CleaningRobots,
     [grid, chart, clean_percentage_element],
